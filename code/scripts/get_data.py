@@ -11,6 +11,8 @@ const_cols = data.columns[data.std() == 0.0]
 data_non_zero_var = data.drop(columns=const_cols, inplace=False)
 
 def get_processed_data(
+    log_transform: bool = True,
+    stability_coef: float = 1e-5,
     corr_thresh: float = 0.95,
     minmax_scale: bool = False,
     var_thresh: float = None,
@@ -21,6 +23,10 @@ def get_processed_data(
     Returns processed data from the age prediction dataset after some feature elimination.
 
     Args:
+        log_transform (bool, optional): Whether to convert the data to log values.
+            Defaults to True.
+        stability_coef (float, optional): Small constant to add while log transforming to handle zeroes.
+            Defaults to 1e-5.
         corr_thresh (float, optional): Maximum correlation between features to allow. Any feature with larger correlation in the upper triangle of the correlation matrix will be dropped. Set to None to keep all features.
             Defaults to 0.95.
         minmax_scale (bool, optional): Whether to scale the data so that each column has values between 0.0 and 1.0.
@@ -29,13 +35,16 @@ def get_processed_data(
             Defaults to None.
         k_to_select (int or str, optional): The number of features to select, after the above processing. Set to 'all' to select all features.
             Defaults to 'all'.
-        selection_metric (Callable, optional): The selection metric to use to choose the top `k_to_select` features. Ideally a function from sklearn.feature_selection.
+        selection_metric (Callable, optional): The selection metric to use to choose the top `k_to_select` features. Ideally a function from sklearn.feature_selection usable in sklearn.feature_selection.SelectKBest.
             Defaults to sklearn.feature_selection.f_regression.
         
     Returns:
         (data_proc, labels) (Tuple[pd.DataFrame, pd.Series]): The data after processing and the true labels.
     """
     data_proc = data_non_zero_var.copy()
+
+    if log_transform:
+        data_proc = np.log2(data_proc + stability_coef)
 
     if corr_thresh is not None:
         corr_matrix = data_proc.corr().abs()
