@@ -2,11 +2,12 @@ from argparse import ArgumentParser
 import pandas as pd
 from timeit import default_timer as timer
 from scripts.models import VotingClassifier
-from sklearn.linear_model import LinearRegression, LogisticRegression
+from sklearn.linear_model import LinearRegression, LogisticRegression, ElasticNet
 from sklearn.svm import SVC, SVR
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestRegressor, HistGradientBoostingRegressor, HistGradientBoostingClassifier
 from sklearn.model_selection import LeaveOneOut
 from sklearn.metrics import mean_absolute_error, median_absolute_error, r2_score 
 import numpy as np
@@ -14,37 +15,46 @@ import matplotlib.pyplot as plt
 from seaborn import regplot
 
 parser = ArgumentParser()
-parser.add_argument('-e', '--estimator', type=str, choices=['voting', 'svm', 'linreg'], default='voting', help='Estimator to use')
-parser.add_argument('-b', '--base', type=str, choices=['lda', 'logreg', 'svm', 'knn', 'tree'], default='lda', help='Base estimator to use with voting estimator')
+parser.add_argument('-e', '--estimator', type=str, choices=['voting', 'svm', 'linreg', 'rf', 'hgb', 'elastic'], default='voting', help='Estimator to use')
+parser.add_argument('-b', '--base', type=str, choices=['lda', 'logreg', 'svm', 'knn', 'tree', 'hgb'], default='lda', help='Base estimator to use with voting estimator')
 parser.add_argument('-C', type=float, default=1., help='Value of C for SVC in the voting ensemble')
+parser.add_argument('-r', '--ratio', type=float, default=0.5, help='Value of L1/L2 ration for elasticnet')
+
 args = parser.parse_args()
 
 data, labels = pd.read_csv('../data/data_proc.csv'), pd.read_csv('../data/labels.csv')
 
-if args.base == 'lda':
-    base_estimator = LDA(solver='eigen', shrinkage='auto')
-elif args.base == 'logreg':
+if args.base == 'logreg':
     base_estimator = LogisticRegression()
 elif args.base == 'svm':
-    base_estimator = SVC(kernel='poly', degree=2, C=args.C, coef0=1.)
+    base_estimator = SVC(kernel='linear', C=args.C)
 elif args.base == 'knn':
     base_estimator = KNeighborsClassifier()
-else:
+elif args.base == 'tree':
     base_estimator = DecisionTreeClassifier()
+elif args.base == 'hgb':
+    base_estimator = HistGradientBoostingClassifier()
+else:
+    base_estimator = LDA(solver='eigen', shrinkage='auto')
 
 def get_model():
-    if args.estimator == 'voting':
-        model = VotingClassifier(20, base_estimator)
-    elif args.estimator == 'svm':
+    if args.estimator == 'svm':
         model = SVR(kernel='linear')
-    else:
+    elif args.estimator == 'linreg':
         model = LinearRegression()
+    elif args.estimator == 'rf':
+        model = RandomForestRegressor(criterion='absolute_error', max_features=0.9)
+    elif args.estimator == 'hgb':
+        model = HistGradientBoostingRegressor(loss='absolute_error')
+    elif args.estimator == 'elastic':
+        model = ElasticNet(l1_ratio=args.ratio)
+    else:
+        model = VotingClassifier(20, base_estimator)
     return model
 
-desc_name = f'voting_{args.base}_{args.C}' if args.estimator == 'voting' else args.estimator
+desc_name = f'voting_{args.base}' if args.estimator == 'voting' else args.estimator
 
-# log_path = '../logs/logs_ensemble.txt'
-log_path = '../logs/logs_svm_ensemble_cv.txt'
+log_path = '../logs/logs_ensemble.txt'
 
 def add_log(log: str, end: str = '\n'):
     with open(log_path, mode='a') as f:
@@ -89,4 +99,4 @@ regplot(x=true_labels, y=pred_labels)
 plt.title(desc_name)
 plt.xlabel('True ages')
 plt.ylabel('Predictions')
-plt.savefig(f'../plots/svm_ensemble_cv/{desc_name}.png')
+plt.savefig(f'../plots/{desc_name}.png')
