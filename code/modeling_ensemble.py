@@ -16,6 +16,7 @@ from seaborn import regplot
 
 parser = ArgumentParser()
 parser.add_argument('-e', '--estimator', type=str, choices=['voting', 'svm', 'linreg', 'rf', 'hgb', 'elastic'], default='voting', help='Estimator to use')
+parser.add_argument('-bs', '--bin_size', type=int, default=20, help='Bin size for voting classifier')
 parser.add_argument('-b', '--base', type=str, choices=['lda', 'logreg', 'svm', 'knn', 'tree', 'hgb'], default='lda', help='Base estimator to use with voting estimator')
 parser.add_argument('-C', type=float, default=1., help='Value of C for SVC in the voting ensemble')
 parser.add_argument('-r', '--ratio', type=float, default=0.5, help='Value of L1/L2 ration for elasticnet')
@@ -49,12 +50,13 @@ def get_model():
     elif args.estimator == 'elastic':
         model = ElasticNet(l1_ratio=args.ratio)
     else:
-        model = VotingClassifier(20, base_estimator)
+        model = VotingClassifier(args.bin_size, base_estimator)
     return model
 
 desc_name = f'voting_{args.base}' if args.estimator == 'voting' else args.estimator
+desc_name += f'_{args.bin_size}'
 
-log_path = '../logs/logs_ensemble.txt'
+log_path = f'../logs/logs_ensemble_{args.base}.txt'
 
 def add_log(log: str, end: str = '\n'):
     with open(log_path, mode='a') as f:
@@ -99,4 +101,4 @@ regplot(x=true_labels, y=pred_labels)
 plt.title(desc_name)
 plt.xlabel('True ages')
 plt.ylabel('Predictions')
-plt.savefig(f'../plots/{desc_name}.png')
+plt.savefig(f'../plots/bin_size_cv/{desc_name}.png')
