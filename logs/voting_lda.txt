@@ -1,0 +1,8 @@
+****************************************************************************************************
+
+voting_lda
+Average train time: 8.994198 s, average eval time: 0.004567 s
+Mean absolute error: 8.729323308270677
+Median absolute error: 4.0
+R2 score: 0.7434146869533396
+

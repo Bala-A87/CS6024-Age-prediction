@@ -1,0 +1,72 @@
+****************************************************************************************************
+
+voting_svm0.0001
+Average train time: 0.145258 s, average eval time: 0.002829 s
+Mean absolute error: 30.466165413533833
+Median absolute error: 22.0
+R2 score: -0.7260465704448391
+
+****************************************************************************************************
+
+voting_svm0.001
+Average train time: 0.290476 s, average eval time: 0.006062 s
+Mean absolute error: 21.48872180451128
+Median absolute error: 17.0
+R2 score: 0.025370795085061126
+
+****************************************************************************************************
+
+voting_svm0.01
+Average train time: 0.146052 s, average eval time: 0.003294 s
+Mean absolute error: 17.593984962406015
+Median absolute error: 10.0
+R2 score: 0.23778881397304952
+
+****************************************************************************************************
+
+voting_svm0.1
+Average train time: 0.157750 s, average eval time: 0.003223 s
+Mean absolute error: 9.894736842105264
+Median absolute error: 4.0
+R2 score: 0.7034156641164625
+
+****************************************************************************************************
+
+voting_svm1.0
+Average train time: 0.161971 s, average eval time: 0.003197 s
+Mean absolute error: 9.766917293233083
+Median absolute error: 4.0
+R2 score: 0.6974544900645503
+
+****************************************************************************************************
+
+voting_svm10.0
+Average train time: 0.264099 s, average eval time: 0.005246 s
+Mean absolute error: 9.766917293233083
+Median absolute error: 4.0
+R2 score: 0.6974544900645503
+
+****************************************************************************************************
+
+voting_svm100.0
+Average train time: 0.167275 s, average eval time: 0.003330 s
+Mean absolute error: 9.766917293233083
+Median absolute error: 4.0
+R2 score: 0.6974544900645503
+
+****************************************************************************************************
+
+voting_svm1000.0
+Average train time: 0.157557 s, average eval time: 0.003196 s
+Mean absolute error: 9.766917293233083
+Median absolute error: 4.0
+R2 score: 0.6974544900645503
+
+****************************************************************************************************
+
+voting_svm10000.0
+Average train time: 0.163795 s, average eval time: 0.003204 s
+Mean absolute error: 9.766917293233083
+Median absolute error: 4.0
+R2 score: 0.6974544900645503
+
