@@ -8,12 +8,13 @@ class VotingClassifier:
         for i in range(bin_size):
             self.models[i] = clone(estimator)
 
-    def train(self, data, labels):
+    def fit(self, data: np.array, labels: np.array):
         for i in range(self.bin_size):
-            binned_labels = labels.apply(lambda x: (x - i) // self.bin_size)
+            # binned_labels = labels.apply(lambda x: (x - i) // self.bin_size)
+            binned_labels = (labels - i) // self.bin_size
             self.models[i].fit(data, binned_labels)
 
-    def predict(self, data):
+    def predict(self, data: np.array):
         predictions = [self.models[i].predict(data) for i in range(self.bin_size)]
         age_predictions = np.zeros((data.shape[0], 121)) # 120 is the max age
         for i in range(self.bin_size):
