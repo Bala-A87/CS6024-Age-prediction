@@ -1,0 +1,8 @@
+****************************************************************************************************
+
+hier_lda_lda
+Average train time: 2.179537 s, average eval time: 0.000855 s
+Mean absolute error: 10.646616541353383
+Median absolute error: 5.0
+R2 score: 0.6736370969441619
+

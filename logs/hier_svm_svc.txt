@@ -1,0 +1,8 @@
+****************************************************************************************************
+
+hier_svm_svc
+Average train time: 0.022066 s, average eval time: 0.000474 s
+Mean absolute error: 12.81203007518797
+Median absolute error: 6.0
+R2 score: 0.5361933556739648
+

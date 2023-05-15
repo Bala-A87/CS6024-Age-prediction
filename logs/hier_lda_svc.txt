@@ -1,0 +1,8 @@
+****************************************************************************************************
+
+hier_lda_svc
+Average train time: 0.408113 s, average eval time: 0.000684 s
+Mean absolute error: 10.488721804511279
+Median absolute error: 5.0
+R2 score: 0.6881896424540973
+
