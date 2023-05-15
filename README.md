@@ -7,7 +7,7 @@ We use the *Age prediction using machine learning* dataset, obtained from [here]
 
 The dataset has not been included in the repository since it is openly available. To run the code present in the repository, please download the dataset and save it as `dataset.tsv` in a new folder `data` created in the cloned repository. The helper script [get_dataset.sh](./get_dataset.sh) should do the same.
 
-Once this is done, the directory structure would be as follows: <!-- Update as time progresses -->
+Once this is done, the directory structure would be as follows: 
 
 ```bash
 .
@@ -15,7 +15,11 @@ Once this is done, the directory structure would be as follows: <!-- Update as t
 │   └── ...
 ├── data
 │   └── dataset.tsv
+├── ...
 ├── Proposal.pdf
 └── README.md
 ```
 
+## Structure
+
+All source code is present in [code](./code/). Helper scripts are present in [scripts](./code/scripts/) to help with loading data and building models. The used code is also distributed across the notebooks but follows the logical 3-phase sequence of EDA, modeling and result analysis. [Logs](./logs/) and [plots](./plots/) contain cross-validation information and final plots. 
