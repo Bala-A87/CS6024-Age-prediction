@@ -1,7 +1,7 @@
 from argparse import ArgumentParser
 from timeit import default_timer as timer
 from scripts.get_data import get_processed_data
-from scripts.models import VotingClassifier
+from scripts.models import VotingClassifier, HierarchicalModel
 from sklearn.feature_selection import SelectKBest, f_regression
 from sklearn.linear_model import LinearRegression, LogisticRegression
 from sklearn.svm import SVC, SVR
@@ -12,10 +12,13 @@ import numpy as np
 from warnings import catch_warnings, simplefilter
 
 parser = ArgumentParser()
-parser.add_argument('-e', '--estimator', type=str, choices=['voting', 'svm', 'linreg'], default='voting', help='Estimator to use')
+parser.add_argument('-e', '--estimator', type=str, choices=['voting', 'svm', 'linreg', 'hier'], default='voting', help='Estimator to use')
 parser.add_argument('-bs', '--bin_size', type=int, default=20, help='Bin size for voting classifier')
 parser.add_argument('-b', '--base', type=str, choices=['lda', 'logreg', 'svm'], default='lda', help='Base estimator to use with voting estimator')
 parser.add_argument('-C', type=float, default=1., help='Value of C for SVC in the voting ensemble')
+parser.add_argument('-n', '--num_bins', type=int, default=4, help='Number of bins in the hierarchical ensemble')
+parser.add_argument('-e1', '--estimator1', type=str, choices=['svm', 'lda', 'logreg'], default='svm', help='Binner for the hierarchical ensemble')
+parser.add_argument('-e2', '--estimator2', type=str, choices=['svc', 'svr', 'lda', 'linreg', 'logreg'], default='svc', help='Predictor for the hierarchical ensemble')
 
 args = parser.parse_args()
 
@@ -23,23 +26,41 @@ data, labels = get_processed_data(corr_thresh=0.9, minmax_scale=True, var_thresh
 data_arr, labels_arr = np.array(data), np.array(labels)
 print('Data loaded')
 
-if args.base == 'logreg':
-    base_estimator = LogisticRegression()
-elif args.base == 'svm':
-    base_estimator = SVC(kernel='linear', C=args.C)
-else:
-    base_estimator = LDA(solver='eigen', shrinkage='auto')
+base_map = {
+    'logreg': LogisticRegression(),
+    'svm': SVC(kernel='linear', C=args.C),
+    'lda': LDA(solver='eigen', shrinkage='auto')
+}
+pred_map = {
+    'svc': SVC(kernel='linear'),
+    'svr': SVR(kernel='linear'),
+    'lda': LDA(solver='eigen', shrinkage='auto'),
+    'linreg': LinearRegression(),
+    'logreg': LogisticRegression()
+}
+
+base_estimator = base_map[args.base]
+estimator1 = base_map[args.estimator1]
+estimator2 = pred_map[args.estimator2]
 
 def get_model():
     if args.estimator == 'svm':
         model = SVR(kernel='linear')
     elif args.estimator == 'linreg':
         model = LinearRegression()
+    elif args.estimator == 'hier':
+        model = HierarchicalModel(args.num_bins, estimator1, estimator2)
     else:
         model = VotingClassifier(args.bin_size, base_estimator)
     return model
 
-desc_name = f'{args.estimator}_{args.base}' if args.estimator == 'voting' else args.estimator
+# desc_name = f'{args.estimator}_{args.base}' if args.estimator == 'voting' else args.estimator
+if args.estimator == 'voting':
+    desc_name = f'voting_{args.base}'
+elif args.estimator == 'hier':
+    desc_name = f'hier_{args.estimator1}_{args.estimator2}'
+else:
+    desc_name = args.estimator
 
 log_path = f'../logs/{desc_name}.txt'
 
